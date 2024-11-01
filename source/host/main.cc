@@ -1,4 +1,5 @@
-#include "host/System.hh"
+//#include "host/System.hh"
+#include "kgameinstance/KGameInstance.hh"
 
 #if defined(__arm64__) || defined(__aarch64__)
 static void FlushDenormalsToZero() {
@@ -16,5 +17,20 @@ static void FlushDenormalsToZero() {
 
 int main(int argc, char **argv) {
     FlushDenormalsToZero();
-    return Host::KSystem::Instance().main(argc, argv);
+
+    // Avoid unused variable warnings
+    (void)argc;
+    (void)argv;
+
+    KGameInstance &instance = KGameInstance::Instance();
+    instance.initMemory();
+    instance.init();
+
+    while (true) {
+        // Does nothing for the moment
+        instance.calc();
+    }
+
+    //return Host::KSystem::Instance().main(argc, argv);
+    return 0;
 }

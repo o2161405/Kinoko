@@ -50,7 +50,7 @@ void SceneManager::createChildScene(int id, Scene *parent) {
 
 /// @addr{0x8023B0E4}
 void SceneManager::createScene(int id, Scene *parent) {
-    Heap *parentHeap = parent ? parent->heap() : Host::KSystem::Instance().rootHeap();
+    Heap *parentHeap = parent ? parent->heap() : this->m_rootHeap;
 
     // We need to preserve the locked status to reinstate it later
     bool locked = parentHeap->tstDisableAllocation();
@@ -207,6 +207,21 @@ void SceneManager::setupNextSceneId() {
     m_prevSceneId = m_currentSceneId;
     m_currentSceneId = m_nextSceneId;
     m_nextSceneId = -1;
+}
+
+void SceneManager::initMemory() {
+    constexpr size_t MEMORY_SPACE_SIZE = 0x1000000;
+    Abstract::Memory::MEMiHeapHead::OptFlag opt;
+    opt.setBit(Abstract::Memory::MEMiHeapHead::eOptFlag::ZeroFillAlloc);
+
+#ifdef BUILD_DEBUG
+    opt.setBit(Abstract::Memory::MEMiHeapHead::eOptFlag::DebugFillAlloc);
+#endif
+
+    m_memorySpace = malloc(MEMORY_SPACE_SIZE);
+    m_rootHeap = EGG::ExpHeap::create(m_memorySpace, MEMORY_SPACE_SIZE, opt);
+    m_rootHeap->setName("EGGRoot");
+    m_rootHeap->becomeCurrentHeap();
 }
 
 Heap *SceneManager::s_heapForCreateScene = nullptr;

@@ -41,6 +41,7 @@ public:
     bool destroyToSelectSceneId(int nextSceneId);
     [[nodiscard]] Scene *findParentScene(int id) const;
     void setupNextSceneId();
+    void initMemory();
 
     /*----------*
         Getters
@@ -79,6 +80,9 @@ private:
 
     static Heap *s_heapForCreateScene;
     static u16 s_heapOptionFlg;
+
+    void *m_memorySpace;
+    EGG::Heap *m_rootHeap;
 };
 
 } // namespace EGG
