@@ -11,7 +11,8 @@ KRaceParams g_raceParams = {Course::SNES_Mario_Circuit_3, Character::Daisy, Vehi
 static void *s_memorySpace = nullptr;
 //static EGG::Heap *s_rootHeap = nullptr;
 
-KGameInstance::KGameInstance(Host::SceneCreatorDynamic *creator) : EGG::SceneManager(creator) {}
+KGameInstance::KGameInstance(Host::SceneCreatorDynamic *creator)
+    : EGG::SceneManager(creator), m_player(nullptr), m_controller(nullptr), m_rootHeap(nullptr) {}
 
 KGameInstance::~KGameInstance() = default;
 
