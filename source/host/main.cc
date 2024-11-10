@@ -1,4 +1,4 @@
-#include "host/System.hh"
+#include "game/kgameinstance/kgameinstance.hh"
 
 #if defined(__arm64__) || defined(__aarch64__)
 static void FlushDenormalsToZero() {
@@ -16,5 +16,15 @@ static void FlushDenormalsToZero() {
 
 int main(int argc, char **argv) {
     FlushDenormalsToZero();
-    return Host::KSystem::Instance().main(argc, argv);
+    (void)argc;
+    (void)argv;
+
+    KGameInstance instance = KGameInstance::Instance();
+    instance.init();
+
+    while (true) {
+        instance.calc();
+    }
+
+    return 0;
 }
