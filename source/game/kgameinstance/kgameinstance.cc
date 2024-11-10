@@ -8,6 +8,8 @@ struct KRaceParams {
 };
 
 KRaceParams g_raceParams = {Course::SNES_Mario_Circuit_3, Character::Daisy, Vehicle::Mach_Bike, false};
+static void *s_memorySpace = nullptr;
+static EGG::Heap *s_rootHeap = nullptr;
 
 KGameInstance::KGameInstance(Host::SceneCreatorDynamic *creator) : EGG::SceneManager(creator) {}
 
@@ -28,6 +30,23 @@ void KGameInstance::OnInit(System::RaceConfig *config, void *arg) {
 }
 
 void KGameInstance::init() {
+    // If all of Kinoko is linked, the root heap must be created first
+    // Assume that s_memorySpace is type void *, and s_rootHeap is type EGG::Heap *
+    constexpr size_t MEMORY_SPACE_SIZE = 0x1000000;
+
+    // You can alternatively pass 0 instead of an opt
+    Abstract::Memory::MEMiHeapHead::OptFlag opt;
+    opt.setBit(Abstract::Memory::MEMiHeapHead::eOptFlag::ZeroFillAlloc);
+
+#ifdef BUILD_DEBUG
+    opt.setBit(Abstract::Memory::MEMiHeapHead::eOptFlag::DebugFillAlloc);
+#endif
+
+    s_memorySpace = malloc(MEMORY_SPACE_SIZE);
+    s_rootHeap = EGG::ExpHeap::create(s_memorySpace, MEMORY_SPACE_SIZE, opt);
+    s_rootHeap->setName("EGGRoot");
+    s_rootHeap->becomeCurrentHeap();
+
     System::RaceConfig::RegisterInitCallback(OnInit, &g_raceParams);
 
     // Creates the root scene, which creates the race scene
