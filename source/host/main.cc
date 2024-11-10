@@ -14,12 +14,10 @@ static void FlushDenormalsToZero() {
 }
 #endif
 
-int main(int argc, char **argv) {
+int main() {
     FlushDenormalsToZero();
-    (void)argc;
-    (void)argv;
 
-    KGameInstance instance = KGameInstance::Instance();
+    KGameInstance &instance = KGameInstance::Instance();
     instance.init();
 
     while (true) {

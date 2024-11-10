@@ -64,7 +64,7 @@ void KGameInstance::calc() {
     // It is recommended that all of this logic is sent into a separate function, "calcInput"
     // Let's suppose the only input state I can have in this example is as follows:
     // A is pressed, and dpad up is pressed
-    bool accelerate = true;
+    bool accelerate = false;
     bool brake = false;
     bool item = false;
     bool drift = false;
