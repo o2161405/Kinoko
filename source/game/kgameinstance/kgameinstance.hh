@@ -20,6 +20,10 @@ public:
         return instance;
     }
 
+    EGG::Heap *getRootHeap() const {
+        return m_rootHeap;
+    }
+
     const EGG::Vector3f &getPosition() const;
     const EGG::Quatf &getRotation() const;
     const EGG::Vector3f &getInternalVelocity() const;
@@ -29,4 +33,5 @@ private:
     KGameInstance(Host::SceneCreatorDynamic *creator);
     const Kart::KartObject *m_player;
     System::KPadHostController *m_controller;
+    EGG::Heap *m_rootHeap;
 };

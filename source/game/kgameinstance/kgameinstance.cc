@@ -9,7 +9,7 @@ struct KRaceParams {
 
 KRaceParams g_raceParams = {Course::SNES_Mario_Circuit_3, Character::Daisy, Vehicle::Mach_Bike, false};
 static void *s_memorySpace = nullptr;
-static EGG::Heap *s_rootHeap = nullptr;
+//static EGG::Heap *s_rootHeap = nullptr;
 
 KGameInstance::KGameInstance(Host::SceneCreatorDynamic *creator) : EGG::SceneManager(creator) {}
 
@@ -43,9 +43,9 @@ void KGameInstance::init() {
 #endif
 
     s_memorySpace = malloc(MEMORY_SPACE_SIZE);
-    s_rootHeap = EGG::ExpHeap::create(s_memorySpace, MEMORY_SPACE_SIZE, opt);
-    s_rootHeap->setName("EGGRoot");
-    s_rootHeap->becomeCurrentHeap();
+    m_rootHeap = EGG::ExpHeap::create(s_memorySpace, MEMORY_SPACE_SIZE, opt);
+    m_rootHeap->setName("EGGRoot");
+    m_rootHeap->becomeCurrentHeap();
 
     System::RaceConfig::RegisterInitCallback(OnInit, &g_raceParams);
 
