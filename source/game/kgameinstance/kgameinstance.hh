@@ -6,6 +6,16 @@
 #include <game/kart/KartObject.hh>
 #include <game/system/RaceConfig.hh>
 
+struct InputState {
+    bool accelerate = false;
+    bool brake = false;
+    bool item = false;
+    bool drift = false;
+    int stickX = 0;  // Range: -7 to 7
+    int stickY = 0;  // Range: -7 to 7
+    System::Trick trick = System::Trick::None;
+};
+
 class KGameInstance final : public EGG::SceneManager {
 public:
     ~KGameInstance() override;
@@ -20,6 +30,8 @@ public:
         return instance;
     }
 
+    void setInputState(const InputState& state);
+
     EGG::Heap *getRootHeap() const {
         return m_rootHeap;
     }
@@ -31,7 +43,10 @@ public:
 
 private:
     KGameInstance(Host::SceneCreatorDynamic *creator);
+    void calcInput();
+    
     const Kart::KartObject *m_player;
     System::KPadHostController *m_controller;
     EGG::Heap *m_rootHeap;
+    InputState m_currentInputState;
 };

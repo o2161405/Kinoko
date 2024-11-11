@@ -17,12 +17,25 @@ static void FlushDenormalsToZero() {
 int main() {
     FlushDenormalsToZero();
 
+    // Make game instance
     KGameInstance &instance = KGameInstance::Instance();
     instance.init();
 
-    while (true) {
-        instance.calc();
-    }
+    // Set input
+    InputState state;
+    state.accelerate = true;
+    state.stickX = 3;
+    state.stickY = -2;
+    state.trick = System::Trick::Up;
+    instance.setInputState(state);
+
+    // Calculate scene
+    instance.calc();
+
+    EGG::Vector3f pos = instance.getPosition();
+    EGG::Quatf rot = instance.getRotation();
+    EGG::Vector3f iv = instance.getInternalVelocity();
+    EGG::Vector3f ev = instance.getExternalVelocity();
 
     return 0;
 }

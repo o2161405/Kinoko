@@ -9,7 +9,15 @@ struct KRaceParams {
 
 KRaceParams g_raceParams = {Course::SNES_Mario_Circuit_3, Character::Daisy, Vehicle::Mach_Bike, false};
 static void *s_memorySpace = nullptr;
-//static EGG::Heap *s_rootHeap = nullptr;
+
+namespace {
+    template<typename T>
+    T clamp(T value, T min, T max) {
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+}
 
 KGameInstance::KGameInstance(Host::SceneCreatorDynamic *creator)
     : EGG::SceneManager(creator), m_player(nullptr), m_controller(nullptr), m_rootHeap(nullptr) {}
@@ -25,17 +33,12 @@ void KGameInstance::OnInit(System::RaceConfig *config, void *arg) {
     player.character = params->character;
     player.vehicle = params->vehicle;
     player.driftIsAuto = params->driftIsAuto;
-
-    // Setting the player's type to Local is required
     player.type = System::RaceConfig::Player::Type::Local;
 }
 
 void KGameInstance::init() {
-    // If all of Kinoko is linked, the root heap must be created first
-    // Assume that s_memorySpace is type void *, and s_rootHeap is type EGG::Heap *
     constexpr size_t MEMORY_SPACE_SIZE = 0x1000000;
 
-    // You can alternatively pass 0 instead of an opt
     Abstract::Memory::MEMiHeapHead::OptFlag opt;
     opt.setBit(Abstract::Memory::MEMiHeapHead::eOptFlag::ZeroFillAlloc);
 
@@ -49,37 +52,33 @@ void KGameInstance::init() {
     m_rootHeap->becomeCurrentHeap();
 
     System::RaceConfig::RegisterInitCallback(OnInit, &g_raceParams);
-
-    // Creates the root scene, which creates the race scene
-    // WARN: This will only initialize correctly because of the earlier callback registration!
     changeScene(0);
-
-    // Initializes the pointers for later use
-    // WARN: These are only guaranteed because of the earlier changeScene call!
     m_player = Kart::KartObjectManager::Instance()->object(0);
     m_controller = System::KPadDirector::Instance()->hostController();
 }
 
+void KGameInstance::setInputState(const InputState& state) {
+    m_currentInputState = state;
+}
+
 void KGameInstance::calc() {
-    // It is recommended that all of this logic is sent into a separate function, "calcInput"
-    // Let's suppose the only input state I can have in this example is as follows:
-    // A is pressed, and dpad up is pressed
-    bool accelerate = false;
-    bool brake = false;
-    bool item = false;
-    bool drift = false;
-
-    // Zero centered, recommended
-    s8 rawStickX = 0;
-    s8 rawStickY = 0;
-
-    System::Trick trick = System::Trick::Up;
-
-    u16 buttons = (accelerate) | (brake << 1) | (item << 2) | (drift << 3);
-    ASSERT(m_controller->setInputsRawStickZeroCenter(buttons, rawStickX, rawStickY, trick));
-
-    // Now that the inputs are set, we can run the next frame of the physics engine by calling this
+    calcInput();
     calcCurrentScene();
+}
+
+void KGameInstance::calcInput() {
+    u16 buttons = 0;
+    buttons |= (m_currentInputState.accelerate ? 1 : 0);
+    buttons |= (m_currentInputState.brake ? 1 : 0) << 1;
+    buttons |= (m_currentInputState.item ? 1 : 0) << 2;
+    buttons |= (m_currentInputState.drift ? 1 : 0) << 3;
+
+    // Clamp stick values to valid range (-7 to 7)
+    s8 stickX = static_cast<s8>(clamp(m_currentInputState.stickX, -7, 7));
+    s8 stickY = static_cast<s8>(clamp(m_currentInputState.stickY, -7, 7));
+
+    // Set the inputs on the controller
+    ASSERT(m_controller->setInputsRawStickZeroCenter(buttons, stickX, stickY, m_currentInputState.trick));
 }
 
 const EGG::Vector3f &KGameInstance::getPosition() const {
