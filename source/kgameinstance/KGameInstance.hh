@@ -20,6 +20,22 @@ public:
 
     EGG::Heap* m_rootHeap;
 
+    const EGG::Vector3f &getPosition() const {
+        return m_player->pos();
+    }
+
+    const EGG::Quatf &getRotation() const {
+        return m_player->fullRot();
+    }
+
+    const EGG::Vector3f &getInternalVelocity() const {
+        return m_player->intVel();
+    }
+
+    const EGG::Vector3f &getExternalVelocity() const {
+        return m_player->extVel();
+    }
+
 private:
     KGameInstance(Host::SceneCreatorDynamic *creator);
     const Kart::KartObject *m_player;
