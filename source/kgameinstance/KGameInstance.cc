@@ -59,24 +59,22 @@ void KGameInstance::init() {
     m_controller = System::KPadDirector::Instance()->hostController();
 }
 
-void KGameInstance::calc() {
-    // It is recommended that all of this logic is sent into a separate function, "calcInput"
-    // Let's suppose the only input state I can have in this example is as follows:
-    // A is pressed, and dpad up is pressed
-    bool accelerate = true;
-    bool brake = false;
-    bool item = false;
-    bool drift = false;
+void KGameInstance::calcInput(bool accelerate_, bool brake_, bool item_, bool drift_,
+    int rawStickX_, int rawStickY_, int trick_) {
 
-    // Zero centered, recommended
-    s8 rawStickX = 0;
-    s8 rawStickY = 0;
+    bool accelerate = accelerate_;
+    bool brake = brake_;
+    bool item = item_;
+    bool drift = drift_;
 
-    System::Trick trick = System::Trick::Up;
+    s8 rawStickX = static_cast<s8>(rawStickX_);
+    s8 rawStickY = static_cast<s8>(rawStickY_);
+    System::Trick trick = static_cast<System::Trick>(trick_);
 
     u16 buttons = (accelerate) | (brake << 1) | (item << 2) | (drift << 3);
     ASSERT(m_controller->setInputsRawStickZeroCenter(buttons, rawStickX, rawStickY, trick));
+}
 
-    // Now that the inputs are set, we can run the next frame of the physics engine by calling this
+void KGameInstance::calc() {
     calcCurrentScene();
 }

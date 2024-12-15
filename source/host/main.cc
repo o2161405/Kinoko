@@ -19,9 +19,8 @@ int main() {
     
     KGameInstance &instance = KGameInstance::Instance();
 
-    instance.init();
-
     while (true) {
+        instance.calcInput(true, false, false, false, 0, 0, 0);
         instance.calc();
     }
 

@@ -11,9 +11,11 @@ public:
     static KGameInstance &Instance() {
         static Host::SceneCreatorDynamic creator;
         static KGameInstance instance(&creator);
+        instance.init();
         return instance;
     }
     ~KGameInstance() override;
+    void calcInput(bool accelerate_, bool brake_, bool item_, bool drift_, int rawStickX_, int rawStickY_, int trick_);
     void calc() override;
     void init();
     static void OnInit(System::RaceConfig *config, void *arg);
