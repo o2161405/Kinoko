@@ -4,6 +4,8 @@
 
 #include <host/System.hh>
 
+#include "kgameinstance/KGameInstance.hh"
+
 namespace EGG {
 
 /*------------*
@@ -50,7 +52,7 @@ void SceneManager::createChildScene(int id, Scene *parent) {
 
 /// @addr{0x8023B0E4}
 void SceneManager::createScene(int id, Scene *parent) {
-    Heap *parentHeap = parent ? parent->heap() : Host::KSystem::Instance().rootHeap();
+    Heap *parentHeap = parent ? parent->heap() : KGameInstance::Instance().m_rootHeap;
 
     // We need to preserve the locked status to reinstate it later
     bool locked = parentHeap->tstDisableAllocation();
@@ -98,7 +100,7 @@ void SceneManager::destroyScene(Scene *scene) {
     }
 
     scene->heap()->destroy();
-    Heap *parentHeap = parent ? parent->heap() : Host::KSystem::Instance().rootHeap();
+    Heap *parentHeap = parent ? parent->heap() : KGameInstance::Instance().m_rootHeap;
     parentHeap->becomeCurrentHeap();
 }
 
